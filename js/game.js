@@ -7,7 +7,7 @@ const tamañoCelda = 50;
 const frutas = ['🍎', '🍌', '🍇', '🍓', '🍊']; // Array de frutas
 let tablero = [];
 let frutaSeleccionada = null;
-let eliminacionesCompletadas = false;
+let bloqueado = false; // Bloquear la interacción mientras se están ejecutando las animaciones
 
 // Crear una fruta
 function crearFruta(tipo, fila, col) {
@@ -17,7 +17,6 @@ function crearFruta(tipo, fila, col) {
         col,
         yActual: fila * tamañoCelda,  // Posición actual (para animación de caída)
         opacidad: 1,  // Opacidad (para animación de desvanecimiento)
-        eliminar: false, // Indicador para marcar frutas que deben ser eliminadas
     };
 }
 
@@ -54,6 +53,8 @@ function dibujarTablero() {
 
 // Manejar clic del usuario
 canvas.addEventListener('click', (event) => {
+    if (bloqueado) return;  // Si el juego está bloqueado (animaciones en progreso), ignorar los clics
+
     const x = event.offsetX;
     const y = event.offsetY;
 
@@ -64,16 +65,19 @@ canvas.addEventListener('click', (event) => {
         intercambiarFrutas(frutaSeleccionada, { fila, col });
         frutaSeleccionada = null;
 
-        // Detectar combinaciones después del intercambio
         const combinaciones = detectarCombinaciones();
         if (combinaciones.length > 0) {
             eliminarCombinaciones(combinaciones, () => {
                 aplicarGravedad(() => {
-                    rellenarTablero();
+                    rellenarTablero(() => {
+                        verificarCombinacionesAutomaticas(); // Verificar si se crearon nuevas combinaciones después de rellenar
+                    });
                 });
             });
         } else {
-            dibujarTablero();  // Redibujar si no hubo combinación
+            // Si no hay combinaciones, revertir el intercambio
+            intercambiarFrutas({ fila, col }, frutaSeleccionada);
+            dibujarTablero();
         }
     } else {
         frutaSeleccionada = { fila, col };
@@ -96,7 +100,7 @@ function detectarCombinaciones() {
     for (let fila = 0; fila < filas; fila++) {
         for (let col = 0; col < columnas - 2; col++) {
             const fruta = tablero[fila][col];
-            if (fruta.tipo === tablero[fila][col + 1].tipo && fruta.tipo === tablero[fila][col + 2].tipo) {
+            if (fruta && fruta.tipo === tablero[fila][col + 1]?.tipo && fruta.tipo === tablero[fila][col + 2]?.tipo) {
                 combinaciones.push({ fila, col });
             }
         }
@@ -106,7 +110,7 @@ function detectarCombinaciones() {
     for (let col = 0; col < columnas; col++) {
         for (let fila = 0; fila < filas - 2; fila++) {
             const fruta = tablero[fila][col];
-            if (fruta.tipo === tablero[fila + 1][col].tipo && fruta.tipo === tablero[fila + 2][col].tipo) {
+            if (fruta && fruta.tipo === tablero[fila + 1][col]?.tipo && fruta.tipo === tablero[fila + 2][col]?.tipo) {
                 combinaciones.push({ fila, col });
             }
         }
@@ -117,20 +121,26 @@ function detectarCombinaciones() {
 
 // Eliminar combinaciones con animación
 function eliminarCombinaciones(combinaciones, callback) {
+    bloqueado = true;  // Bloquear la interacción mientras se eliminan frutas
     let frutasAEliminar = [];
-    
+
     combinaciones.forEach(({ fila, col }) => {
-        for (let i = 0; i < 3; i++) {  // Añadir las tres frutas en la combinación
-            const fruta = tablero[fila][col + i];
-            fruta.eliminar = true;
-            frutasAEliminar.push(fruta);
-            animarDesvanecimiento(fruta);
+        // Asegurarnos de no intentar eliminar frutas fuera del tablero o que ya no existan
+        for (let i = 0; i < 3; i++) {
+            const fruta = tablero[fila]?.[col + i];  // Verificar si la fruta en la posición existe
+            if (fruta) {
+                frutasAEliminar.push(fruta);
+                animarDesvanecimiento(fruta);
+            }
         }
     });
 
     setTimeout(() => {
         frutasAEliminar.forEach(fruta => {
-            tablero[fruta.fila][fruta.col] = null;  // Eliminar del tablero
+            // Asegurarnos de que la fruta aún existe antes de eliminarla
+            if (tablero[fruta.fila]?.[fruta.col]) {
+                tablero[fruta.fila][fruta.col] = null;  // Eliminar del tablero
+            }
         });
         callback();  // Llamar al callback cuando termine la eliminación
     }, 500);  // Esperar 500ms para la animación de desvanecimiento
@@ -138,7 +148,7 @@ function eliminarCombinaciones(combinaciones, callback) {
 
 // Animar desvanecimiento de frutas
 function animarDesvanecimiento(fruta) {
-    const duracion = 500; // 500ms de duración de la animación
+    const duracion = 500;  // 500ms de duración de la animación
     const frameRate = 60;  // 60 frames por segundo
     const framesTotales = duracion / (1000 / frameRate);
     let frameActual = 0;
@@ -158,21 +168,24 @@ function animarDesvanecimiento(fruta) {
 
 // Aplicar gravedad para las frutas que caen
 function aplicarGravedad(callback) {
+    bloqueado = true;  // Bloquear la interacción mientras las frutas caen
     let frutasCaidas = 0;
 
     for (let col = 0; col < columnas; col++) {
         for (let fila = filas - 1; fila >= 0; fila--) {
-            if (!tablero[fila][col]) {
+            if (!tablero[fila][col]) {  // Si la posición está vacía
+                // Buscar la fruta más cercana por encima para que caiga
                 for (let filaArriba = fila - 1; filaArriba >= 0; filaArriba--) {
                     if (tablero[filaArriba][col]) {
+                        // Mover fruta hacia abajo
                         tablero[fila][col] = tablero[filaArriba][col];
-                        tablero[filaArriba][col] = null;
+                        tablero[filaArriba][col] = null;  // Vaciar la posición anterior
                         tablero[fila][col].fila = fila;  // Actualizar la fila de la fruta que cae
                         frutasCaidas++;
                         animarCaida(tablero[fila][col], () => {
                             frutasCaidas--;
                             if (frutasCaidas === 0) {
-                                callback();  // Llamar a callback cuando todas las frutas hayan caído
+                                callback();  // Llamar al callback cuando todas las frutas hayan caído
                             }
                         });
                         break;
@@ -180,6 +193,11 @@ function aplicarGravedad(callback) {
                 }
             }
         }
+    }
+
+    // Si no hubo frutas que caer, continuar con el callback
+    if (frutasCaidas === 0) {
+        callback();
     }
 }
 
@@ -207,15 +225,43 @@ function animarCaida(fruta, callback) {
 }
 
 // Rellenar el tablero con nuevas frutas
-function rellenarTablero() {
-    for (let fila = 0; fila < filas; fila++) {
-        for (let col = 0; col < columnas; col++) {
+function rellenarTablero(callback) {
+    let nuevasFrutas = 0;
+
+    for (let col = 0; col < columnas; col++) {
+        for (let fila = 0; fila < filas; fila++) {
             if (!tablero[fila][col]) {
+                // Crear una nueva fruta en la parte superior y hacerla caer
                 const nuevaFruta = crearFruta(frutas[Math.floor(Math.random() * frutas.length)], fila, col);
                 tablero[fila][col] = nuevaFruta;
-                animarCaida(nuevaFruta, () => {});
+                nuevasFrutas++;
+                animarCaida(nuevaFruta, () => {
+                    nuevasFrutas--;
+                    if (nuevasFrutas === 0) {
+                        callback();  // Llamar al callback cuando todas las nuevas frutas hayan caído
+                    }
+                });
             }
         }
+    }
+
+    // Si no hubo nuevas frutas, continuar con el callback
+    if (nuevasFrutas === 0) {
+        callback();
+    }
+}
+
+// Verificar combinaciones automáticas después de rellenar el tablero
+function verificarCombinacionesAutomaticas() {
+    const nuevasCombinaciones = detectarCombinaciones();
+    if (nuevasCombinaciones.length > 0) {
+        eliminarCombinaciones(nuevasCombinaciones, () => {
+            aplicarGravedad(() => {
+                rellenarTablero(verificarCombinacionesAutomaticas);  // Continuar el ciclo si se detectan nuevas combinaciones
+            });
+        });
+    } else {
+        bloqueado = false;  // Desbloquear la interacción si no hay más combinaciones
     }
 }
 
