@@ -153,6 +153,15 @@ function intercambiarFrutas(fila1, col1, fila2, col2) {
     }
 }
 
+// Función que verifica si hay una combinación válida
+function hayCombinacionValida(fruta1, fruta2) {
+    // Aquí implementa la lógica para detectar si se ha formado una combinación válida
+    // Por ejemplo, puedes verificar si después del intercambio hay 3 o más frutas iguales alineadas
+
+    // Por ahora, simplemente devuelve true o false para que la lógica funcione
+    // Implementa tu lógica de combinación aquí
+    return verificarCombinacionesAutomaticas(fruta1, fruta2); // Usando la función existente para validar combinaciones
+}
 
 
 // Detectar combinaciones de frutas (3 o más en fila o columna)
