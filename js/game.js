@@ -108,17 +108,43 @@ function intercambiarFrutas(fila1, col1, fila2, col2) {
 
         // Verificamos que ambas frutas existan antes de proceder
         if (fruta1 && fruta2) {
-            // Intercambiamos las frutas
-            [tablero[fila1][col1], tablero[fila2][col2]] = [tablero[fila2][col2], tablero[fila1][col1]];
+            // Verificamos si las frutas son adyacentes
+            const adyacentes = Math.abs(fila1 - fila2) + Math.abs(col1 - col2) === 1;
 
-            // Actualizamos las posiciones de las frutas
-            fruta1.fila = fila2;
-            fruta1.col = col2;
-            fruta2.fila = fila1;
-            fruta2.col = col1;
+            if (adyacentes) {
+                // Si son adyacentes, intercambiamos las frutas
+                [tablero[fila1][col1], tablero[fila2][col2]] = [tablero[fila2][col2], tablero[fila1][col1]];
 
-            // Llamamos a la función para verificar si se creó una combinación válida
-            verificarCombinacionesAutomaticas(fruta1, fruta2); // Nombre correcto
+                // Actualizamos las posiciones de las frutas
+                fruta1.fila = fila2;
+                fruta1.col = col2;
+                fruta2.fila = fila1;
+                fruta2.col = col1;
+
+                // Verificamos si se creó una combinación válida
+                if (hayCombinacionValida(fruta1, fruta2)) {
+                    // Si hay combinación válida, manejamos la lógica de eliminación y caída de frutas
+                    eliminarFrutasCombinadas(); // Asume que tienes esta función implementada
+                    caerFrutas(); // Maneja la caída de frutas
+                } else {
+                    // Si no hay combinación válida, revertimos el intercambio
+                    console.log("No hay combinación válida. Revirtiendo el intercambio.");
+                    [tablero[fila1][col1], tablero[fila2][col2]] = [tablero[fila2][col2], tablero[fila1][col1]];
+
+                    // Actualizamos las posiciones de las frutas nuevamente
+                    fruta1.fila = fila1;
+                    fruta1.col = col1;
+                    fruta2.fila = fila2;
+                    fruta2.col = col2;
+                }
+
+                // Redibujamos el tablero después de cada intercambio
+                dibujarTablero();
+
+            } else {
+                console.error("Las frutas no son adyacentes.");
+            }
+
         } else {
             console.error("Una o ambas frutas son nulas al intentar intercambiar.");
         }
@@ -126,6 +152,7 @@ function intercambiarFrutas(fila1, col1, fila2, col2) {
         console.error("Las coordenadas están fuera de los límites del tablero.");
     }
 }
+
 
 
 // Detectar combinaciones de frutas (3 o más en fila o columna)
