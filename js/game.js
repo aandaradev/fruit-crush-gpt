@@ -51,6 +51,9 @@ function dibujarTablero() {
     }
 }
 
+// Definimos el tamaño de cada fruta (celda) en píxeles
+const tamanioFruta = 50;  // Cambia este valor si tu fruta tiene un tamaño diferente
+
 // Función para manejar el clic del usuario en el canvas
 canvas.addEventListener('click', function(event) {
     const rect = canvas.getBoundingClientRect();
