@@ -153,6 +153,41 @@ function intercambiarFrutas(fila1, col1, fila2, col2) {
     }
 }
 
+// Lógica para manejar la caída de frutas después de eliminarlas
+function caerFrutas() {
+    for (let col = 0; col < columnas; col++) {
+        for (let fila = filas - 1; fila >= 0; fila--) {
+            if (tablero[fila][col] === null) { // Si hay un hueco en el tablero
+                for (let filaSuperior = fila - 1; filaSuperior >= 0; filaSuperior--) {
+                    if (tablero[filaSuperior][col] !== null) {
+                        // Bajamos la fruta
+                        tablero[fila][col] = tablero[filaSuperior][col];
+                        tablero[filaSuperior][col] = null;
+
+                        // Actualizamos las posiciones de la fruta
+                        tablero[fila][col].fila = fila;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Después de la caída, rellenamos las celdas vacías en la parte superior
+    for (let col = 0; col < columnas; col++) {
+        for (let fila = 0; fila < filas; fila++) {
+            if (tablero[fila][col] === null) {
+                // Creamos una nueva fruta
+                tablero[fila][col] = crearFruta(fila, col);
+            }
+        }
+    }
+
+    // Redibujar el tablero después de la caída
+    dibujarTablero();
+}
+
+
 // Función que verifica si hay una combinación válida
 function hayCombinacionValida(fruta1, fruta2) {
     // Aquí implementa la lógica para detectar si se ha formado una combinación válida
@@ -162,7 +197,6 @@ function hayCombinacionValida(fruta1, fruta2) {
     // Implementa tu lógica de combinación aquí
     return verificarCombinacionesAutomaticas(fruta1, fruta2); // Usando la función existente para validar combinaciones
 }
-
 
 // Detectar combinaciones de frutas (3 o más en fila o columna)
 function detectarCombinaciones() {
