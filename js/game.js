@@ -36,20 +36,19 @@ function inicializarTablero() {
 
 // Dibujar el tablero
 function dibujarTablero() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas antes de dibujar
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
     for (let fila = 0; fila < filas; fila++) {
         for (let col = 0; col < columnas; col++) {
             const fruta = tablero[fila][col];
             if (fruta) {
-                ctx.globalAlpha = fruta.opacidad;  // Aplicar opacidad
-                ctx.strokeRect(col * tamañoCelda, fruta.yActual, tamañoCelda, tamañoCelda);
+                ctx.strokeRect(col * tamañoCelda, fila * tamañoCelda, tamañoCelda, tamañoCelda); // Dibujar celda
                 ctx.font = "30px Arial";
-                ctx.fillText(fruta.tipo, col * tamañoCelda + 10, fruta.yActual + 35);
-                ctx.globalAlpha = 1; // Restablecer opacidad
+                ctx.fillText(fruta.tipo, col * tamañoCelda + 10, fila * tamañoCelda + 35); // Dibujar la fruta
             }
         }
     }
 }
+
 
 // Definimos el tamaño de cada fruta (celda) en píxeles
 const tamanioFruta = 50;  // Cambia este valor si tu fruta tiene un tamaño diferente
