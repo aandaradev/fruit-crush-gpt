@@ -96,9 +96,9 @@ function manejarClick(fila, col) {
     }
 }
 
-// Función para intercambiar frutas
+// Función para intercambiar frutas entre dos celdas del tablero
 function intercambiarFrutas(fila1, col1, fila2, col2) {
-    // Verificamos si las coordenadas están dentro del tablero y que ambas frutas existen
+    // Verificamos si ambas coordenadas están dentro del tablero
     if (
         fila1 >= 0 && fila1 < filas && col1 >= 0 && col1 < columnas &&
         fila2 >= 0 && fila2 < filas && col2 >= 0 && col2 < columnas
@@ -106,16 +106,19 @@ function intercambiarFrutas(fila1, col1, fila2, col2) {
         const fruta1 = tablero[fila1]?.[col1];
         const fruta2 = tablero[fila2]?.[col2];
 
-        // Verificamos si ambas frutas existen antes de proceder
+        // Verificamos que ambas frutas existan antes de proceder
         if (fruta1 && fruta2) {
-            // Intercambiamos las frutas solo si ambas no son null
+            // Intercambiamos las frutas
             [tablero[fila1][col1], tablero[fila2][col2]] = [tablero[fila2][col2], tablero[fila1][col1]];
 
-            // Actualizamos las posiciones en las frutas intercambiadas
+            // Actualizamos las posiciones de las frutas
             fruta1.fila = fila2;
             fruta1.col = col2;
             fruta2.fila = fila1;
             fruta2.col = col1;
+
+            // Llamamos a la función para verificar si se creó una combinación válida
+            verificarCombinacionesAutomaticas(fruta1, fruta2); // Nombre correcto
         } else {
             console.error("Una o ambas frutas son nulas al intentar intercambiar.");
         }
@@ -123,6 +126,7 @@ function intercambiarFrutas(fila1, col1, fila2, col2) {
         console.error("Las coordenadas están fuera de los límites del tablero.");
     }
 }
+
 
 // Detectar combinaciones de frutas (3 o más en fila o columna)
 function detectarCombinaciones() {
