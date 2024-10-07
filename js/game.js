@@ -85,11 +85,32 @@ canvas.addEventListener('click', (event) => {
     dibujarTablero();
 });
 
-// Intercambiar dos frutas
-function intercambiarFrutas(f1, f2) {
-    const temp = tablero[f1.fila][f1.col];
-    tablero[f1.fila][f1.col] = tablero[f2.fila][f2.col];
-    tablero[f2.fila][f2.col] = temp;
+// Función para intercambiar frutas
+function intercambiarFrutas(fila1, col1, fila2, col2) {
+    // Verificamos si las coordenadas están dentro del tablero y que ambas frutas existen
+    if (
+        fila1 >= 0 && fila1 < filas && col1 >= 0 && col1 < columnas &&
+        fila2 >= 0 && fila2 < filas && col2 >= 0 && col2 < columnas
+    ) {
+        const fruta1 = tablero[fila1]?.[col1];
+        const fruta2 = tablero[fila2]?.[col2];
+
+        // Verificamos si ambas frutas existen antes de proceder
+        if (fruta1 && fruta2) {
+            // Intercambiamos las frutas solo si ambas no son null
+            [tablero[fila1][col1], tablero[fila2][col2]] = [tablero[fila2][col2], tablero[fila1][col1]];
+
+            // Actualizamos las posiciones en las frutas intercambiadas
+            fruta1.fila = fila2;
+            fruta1.col = col2;
+            fruta2.fila = fila1;
+            fruta2.col = col1;
+        } else {
+            console.error("Una o ambas frutas son nulas al intentar intercambiar.");
+        }
+    } else {
+        console.error("Las coordenadas están fuera de los límites del tablero.");
+    }
 }
 
 // Detectar combinaciones de frutas (3 o más en fila o columna)
