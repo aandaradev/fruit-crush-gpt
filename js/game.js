@@ -51,38 +51,21 @@ function dibujarTablero() {
     }
 }
 
-// Manejar clic del usuario
-canvas.addEventListener('click', (event) => {
-    if (bloqueado) return;  // Si el juego está bloqueado (animaciones en progreso), ignorar los clics
+// Función para manejar el clic del usuario en el canvas
+canvas.addEventListener('click', function(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
 
-    const x = event.offsetX;
-    const y = event.offsetY;
+    const fila = Math.floor(y / tamanioFruta);
+    const col = Math.floor(x / tamanioFruta);
 
-    const fila = Math.floor(y / tamañoCelda);
-    const col = Math.floor(x / tamañoCelda);
-
-    if (frutaSeleccionada) {
-        intercambiarFrutas(frutaSeleccionada, { fila, col });
-        frutaSeleccionada = null;
-
-        const combinaciones = detectarCombinaciones();
-        if (combinaciones.length > 0) {
-            eliminarCombinaciones(combinaciones, () => {
-                aplicarGravedad(() => {
-                    rellenarTablero(() => {
-                        verificarCombinacionesAutomaticas(); // Verificar si se crearon nuevas combinaciones después de rellenar
-                    });
-                });
-            });
-        } else {
-            // Si no hay combinaciones, revertir el intercambio
-            intercambiarFrutas({ fila, col }, frutaSeleccionada);
-            dibujarTablero();
-        }
+    // Verificamos si las coordenadas están dentro de los límites del tablero antes de continuar
+    if (fila >= 0 && fila < filas && col >= 0 && col < columnas) {
+        manejarClick(fila, col);
     } else {
-        frutaSeleccionada = { fila, col };
+        console.error("Las coordenadas del clic están fuera de los límites del tablero.");
     }
-    dibujarTablero();
 });
 
 // Función para intercambiar frutas
