@@ -68,6 +68,31 @@ canvas.addEventListener('click', function(event) {
     }
 });
 
+// Función para manejar la lógica cuando el usuario hace clic en una fruta
+function manejarClick(fila, col) {
+    const fruta = tablero[fila]?.[col];
+
+    // Si ya hay una fruta seleccionada, intentamos intercambiar
+    if (frutaSeleccionada) {
+        const { fila: fila1, col: col1 } = frutaSeleccionada;
+        const fila2 = fila;
+        const col2 = col;
+
+        // Verificamos que ambas frutas estén adyacentes para el intercambio
+        const adyacentes = Math.abs(fila1 - fila2) + Math.abs(col1 - col2) === 1;
+
+        if (adyacentes) {
+            intercambiarFrutas(fila1, col1, fila2, col2);
+            frutaSeleccionada = null;  // Reiniciamos la selección
+        } else {
+            console.log("Las frutas no son adyacentes.");
+            frutaSeleccionada = null;  // Reiniciamos la selección
+        }
+    } else {
+        frutaSeleccionada = fruta;  // Seleccionamos la fruta
+    }
+}
+
 // Función para intercambiar frutas
 function intercambiarFrutas(fila1, col1, fila2, col2) {
     // Verificamos si las coordenadas están dentro del tablero y que ambas frutas existen
