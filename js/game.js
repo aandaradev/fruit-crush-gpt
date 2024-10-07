@@ -96,41 +96,43 @@ function intercambiarFrutas(f1, f2) {
 function detectarCombinaciones() {
     let combinaciones = [];
 
-    // Revisar filas
+    // Recorrer el tablero para encontrar combinaciones horizontales y verticales
     for (let fila = 0; fila < filas; fila++) {
-        for (let col = 0; col < columnas - 2; col++) {
-            const fruta = tablero[fila][col];
-            if (fruta && fruta.tipo === tablero[fila][col + 1]?.tipo && fruta.tipo === tablero[fila][col + 2]?.tipo) {
-                combinaciones.push({ fila, col });
+        for (let col = 0; col < columnas; col++) {
+            let fruta = tablero[fila]?.[col];  // Acceder de forma segura
+            if (fruta) {
+                // Comprobar combinaciones horizontales
+                if (col + 2 < columnas &&
+                    tablero[fila]?.[col + 1]?.tipo === fruta.tipo &&
+                    tablero[fila]?.[col + 2]?.tipo === fruta.tipo) {
+                    combinaciones.push({ fila, col });  // Guardar posición inicial de la combinación
+                }
+
+                // Comprobar combinaciones verticales
+                if (fila + 2 < filas &&
+                    tablero[fila + 1]?.[col]?.tipo === fruta.tipo &&
+                    tablero[fila + 2]?.[col]?.tipo === fruta.tipo) {
+                    combinaciones.push({ fila, col });
+                }
             }
         }
     }
-
-    // Revisar columnas
-    for (let col = 0; col < columnas; col++) {
-        for (let fila = 0; fila < filas - 2; fila++) {
-            const fruta = tablero[fila][col];
-            if (fruta && fruta.tipo === tablero[fila + 1][col]?.tipo && fruta.tipo === tablero[fila + 2][col]?.tipo) {
-                combinaciones.push({ fila, col });
-            }
-        }
-    }
-
     return combinaciones;
 }
 
 // Eliminar combinaciones con animación
 function eliminarCombinaciones(combinaciones, callback) {
-    bloqueado = true;  // Bloquear la interacción mientras se eliminan frutas
+    bloqueado = true;  // Bloquear interacción durante la eliminación
     let frutasAEliminar = [];
 
+    // Recorrer cada combinación para eliminar frutas
     combinaciones.forEach(({ fila, col }) => {
-        // Asegurarnos de no intentar eliminar frutas fuera del tablero o que ya no existan
-        for (let i = 0; i < 3; i++) {
-            const fruta = tablero[fila]?.[col + i];  // Verificar si la fruta en la posición existe
+        // Verificar que estamos accediendo a una posición válida
+        if (tablero[fila] && tablero[fila][col]) {
+            let fruta = tablero[fila][col];
             if (fruta) {
-                frutasAEliminar.push(fruta);
-                animarDesvanecimiento(fruta);
+                frutasAEliminar.push(fruta);  // Guardamos la fruta para eliminarla luego
+                animarDesvanecimiento(fruta); // Añadir animación de desvanecimiento
             }
         }
     });
@@ -138,12 +140,12 @@ function eliminarCombinaciones(combinaciones, callback) {
     setTimeout(() => {
         frutasAEliminar.forEach(fruta => {
             // Asegurarnos de que la fruta aún existe antes de eliminarla
-            if (tablero[fruta.fila]?.[fruta.col]) {
+            if (tablero[fruta.fila] && tablero[fruta.fila][fruta.col]) {
                 tablero[fruta.fila][fruta.col] = null;  // Eliminar del tablero
             }
         });
-        callback();  // Llamar al callback cuando termine la eliminación
-    }, 500);  // Esperar 500ms para la animación de desvanecimiento
+        callback();  // Llamar al callback una vez todas las frutas se hayan eliminado
+    }, 500);  // Esperar a que la animación termine
 }
 
 // Animar desvanecimiento de frutas
