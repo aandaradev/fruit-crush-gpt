@@ -188,13 +188,46 @@ function caerFrutas() {
 
 
 // Función que verifica si hay una combinación válida
-function hayCombinacionValida(fruta1, fruta2) {
-    // Aquí implementa la lógica para detectar si se ha formado una combinación válida
-    // Por ejemplo, puedes verificar si después del intercambio hay 3 o más frutas iguales alineadas
+function verificarCombinacionHorizontal(fila, col) {
+    const frutaTipo = tablero[fila][col]?.tipo;
+    let contador = 1;
 
-    // Por ahora, simplemente devuelve true o false para que la lógica funcione
-    // Implementa tu lógica de combinación aquí
-    return verificarCombinacionesAutomaticas(fruta1, fruta2); // Usando la función existente para validar combinaciones
+    for (let i = col - 1; i >= 0 && tablero[fila][i]?.tipo === frutaTipo; i--) {
+        contador++;
+    }
+
+    for (let i = col + 1; i < columnas && tablero[fila][i]?.tipo === frutaTipo; i++) {
+        contador++;
+    }
+
+    return contador >= 3;
+}
+
+function verificarCombinacionVertical(fila, col) {
+    const frutaTipo = tablero[fila][col]?.tipo;
+    let contador = 1;
+
+    for (let i = fila - 1; i >= 0 && tablero[i][col]?.tipo === frutaTipo; i--) {
+        contador++;
+    }
+
+    for (let i = fila + 1; i < filas && tablero[i][col]?.tipo === frutaTipo; i++) {
+        contador++;
+    }
+
+    return contador >= 3;
+}
+
+function hayCombinacionValida(fruta1, fruta2) {
+    const combinacionValidaFruta1 =
+        verificarCombinacionHorizontal(fruta1.fila, fruta1.col) ||
+        verificarCombinacionVertical(fruta1.fila, fruta1.col);
+
+    const combinacionValidaFruta2 =
+        verificarCombinacionHorizontal(fruta2.fila, fruta2.col) ||
+        verificarCombinacionVertical(fruta2.fila, fruta2.col);
+
+    return combinacionValidaFruta1 || combinacionValidaFruta2;
 }
 
 // Detectar combinaciones de frutas (3 o más en fila o columna)
