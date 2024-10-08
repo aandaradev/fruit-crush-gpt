@@ -232,29 +232,53 @@ function hayCombinacionValida(fruta1, fruta2) {
 
 // Detectar combinaciones de frutas (3 o más en fila o columna)
 function detectarCombinaciones() {
-    let combinaciones = [];
+    const frutasAEliminar = [];
 
+    // Verificar combinaciones horizontales
     for (let fila = 0; fila < filas; fila++) {
-        for (let col = 0; col < columnas; col++) {
-            let fruta = tablero[fila]?.[col];  // Verificar de forma segura si hay una fruta
-            if (fruta) {
-                // Verificamos combinaciones horizontales (de 3 o más)
-                if (col + 2 < columnas &&
-                    tablero[fila][col + 1]?.tipo === fruta.tipo &&
-                    tablero[fila][col + 2]?.tipo === fruta.tipo) {
-                    combinaciones.push({ fila, col });  // Agregar combinación detectada
+        let contador = 1;
+        for (let col = 1; col < columnas; col++) {
+            if (tablero[fila][col]?.tipo === tablero[fila][col - 1]?.tipo) {
+                contador++;
+            } else {
+                if (contador >= 3) {
+                    for (let k = 0; k < contador; k++) {
+                        frutasAEliminar.push({ fila: fila, col: col - 1 - k });
+                    }
                 }
-
-                // Verificamos combinaciones verticales (de 3 o más)
-                if (fila + 2 < filas &&
-                    tablero[fila + 1]?.[col]?.tipo === fruta.tipo &&
-                    tablero[fila + 2]?.[col]?.tipo === fruta.tipo) {
-                    combinaciones.push({ fila, col });
-                }
+                contador = 1;
+            }
+        }
+        if (contador >= 3) {
+            for (let k = 0; k < contador; k++) {
+                frutasAEliminar.push({ fila: fila, col: columnas - 1 - k });
             }
         }
     }
-    return combinaciones;
+
+    // Verificar combinaciones verticales
+    for (let col = 0; col < columnas; col++) {
+        let contador = 1;
+        for (let fila = 1; fila < filas; fila++) {
+            if (tablero[fila][col]?.tipo === tablero[fila - 1][col]?.tipo) {
+                contador++;
+            } else {
+                if (contador >= 3) {
+                    for (let k = 0; k < contador; k++) {
+                        frutasAEliminar.push({ fila: fila - 1 - k, col: col });
+                    }
+                }
+                contador = 1;
+            }
+        }
+        if (contador >= 3) {
+            for (let k = 0; k < contador; k++) {
+                frutasAEliminar.push({ fila: filas - 1 - k, col: col });
+            }
+        }
+    }
+
+    return frutasAEliminar;
 }
 
 // Eliminar combinaciones con animación
