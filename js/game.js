@@ -37,17 +37,18 @@ function inicializarTablero() {
 
 // Dibujar el tablero
 function dibujarTablero() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+    ctx.clearRect(0, 50, canvas.width, canvas.height); // Limpiar el canvas
     for (let fila = 0; fila < filas; fila++) {
         for (let col = 0; col < columnas; col++) {
             const fruta = tablero[fila][col];
             if (fruta) {
-                ctx.strokeRect(col * tamañoCelda, fila * tamañoCelda, tamañoCelda, tamañoCelda); // Dibujar celda
+                ctx.strokeRect(col * tamañoCelda, fila * tamañoCelda, tamañoCelda + 50, tamañoCelda); // Dibujar celda
                 ctx.font = "30px Arial";
-                ctx.fillText(fruta.tipo, col * tamañoCelda + 10, fila * tamañoCelda + 35); // Dibujar la fruta
+                ctx.fillText(fruta.tipo, col * tamañoCelda + 10, fila * tamañoCelda + 85); // Dibujar la fruta
             }
         }
     }
+    mostrarPuntaje(); // Llamar a mostrarPuntaje para actualizar la puntuación en pantalla
 }
 
 // Función para manejar el clic del usuario en el canvas
