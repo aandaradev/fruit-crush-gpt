@@ -8,6 +8,7 @@ const frutas = ['🍎', '🍌', '🍇', '🍓', '🍊']; // Array de frutas
 let tablero = [];
 let frutaSeleccionada = null;
 let bloqueado = false; // Bloquear la interacción mientras se están ejecutando las animaciones
+let puntaje = 0; // Variable global para almacenar el puntaje
 
 // Crear una fruta
 function crearFruta(tipo, fila, col) {
@@ -241,9 +242,26 @@ function detectarCombinaciones() {
 
 // Eliminar frutas del tablero
 function eliminarFrutas(frutasAEliminar) {
+    let frutasEliminadas = 0; // Contador de frutas eliminadas
+
     frutasAEliminar.forEach(({ fila, col }) => {
-        tablero[fila][col] = null;
+        if (tablero[fila][col] !== null) { // Asegurarnos de que haya una fruta en la celda
+            tablero[fila][col] = null; // Eliminar la fruta del tablero
+            frutasEliminadas++; // Incrementar el contador
+        }
     });
+
+    // Sumar puntos: 10 puntos por cada fruta eliminada
+    puntaje += frutasEliminadas * 10;
+    mostrarPuntaje(); // Actualizar el puntaje en pantalla
+}
+
+function mostrarPuntaje() {
+    // Limpiar el área superior del canvas donde se mostrará el puntaje
+    ctx.clearRect(0, 0, canvas.width, 50); // Limpiar la parte superior del canvas
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "black";
+    ctx.fillText("Puntaje: " + puntaje, 10, 30); // Mostrar el puntaje en la parte superior
 }
 
 // Hacer caer frutas
