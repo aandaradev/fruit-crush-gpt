@@ -258,6 +258,11 @@ function eliminarFrutas(frutasAEliminar) {
         }
     });
 
+    if (frutasEliminadas > 0) {
+        // Reproducir sonido de combinación cuando haya frutas eliminadas
+        sonidoCombinacion.play();
+    }
+
     // Sumar puntos: 10 puntos por cada fruta eliminada
     puntaje += frutasEliminadas * 10;
     mostrarPuntaje(); // Actualizar el puntaje en pantalla
