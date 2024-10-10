@@ -29,7 +29,7 @@
 2. Navega al directorio del proyecto:
 
     ```sh
-    cd juego-de-frutas
+    cd fruit-crush-gpt
     ```
 
 ## Uso
