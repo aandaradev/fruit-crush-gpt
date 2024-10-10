@@ -149,6 +149,9 @@ function intercambiarFrutas(fila1, col1, fila2, col2) {
         const fruta2 = tablero[fila2][col2];
 
         if (fruta1 && fruta2) {
+            // Reproducir sonido de movimiento
+            sonidoMovimiento.play();
+
             // Intercambiar frutas
             [tablero[fila1][col1], tablero[fila2][col2]] = [tablero[fila2][col2], tablero[fila1][col1]];
 
