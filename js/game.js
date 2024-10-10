@@ -10,6 +10,9 @@ let frutaSeleccionada = null;
 let bloqueado = false; // Bloquear la interacción mientras se están ejecutando las animaciones
 let puntaje = 0; // Variable global para almacenar el puntaje
 
+const sonidoMovimiento = new Audio('sounds/movimiento.mp3');
+const sonidoCombinacion = new Audio('sounds/combinacion.mp3');
+
 // Crear una fruta
 function crearFruta(tipo, fila, col) {
     return {
